@@ -1,4 +1,5 @@
 import json
+import time
 
 import os
 import pandas as pd
@@ -31,6 +32,8 @@ def generate_dataset(input_path, output_path, sample_size=None, save_interval=10
 
         prompt = create_prompt(row["answer"])
         output = generate(prompt)
+
+        time.sleep(2)
 
         if output is None:
             continue
