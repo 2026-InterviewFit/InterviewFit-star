@@ -1,0 +1,118 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+
+.venv/
+venv/
+env/
+
+.env
+.env.*
+
+
+# =========================
+# Dataset
+# =========================
+
+# Raw / generated datasets
+data/raw/
+data/generated/
+data/processed/
+data/validated/
+
+# Validation reports
+data/reports/
+
+# Large datasets
+*.jsonl
+*.csv
+
+# Keep samples
+!data/sample/
+!data/sample/*.jsonl
+!data/sample/*.csv
+
+
+# =========================
+# HuggingFace / Unsloth
+# =========================
+
+# Downloaded models
+models/
+base_models/
+
+# LoRA adapters
+lora/
+adapters/
+
+# Merged models
+merged_model/
+
+# Model weights
+*.safetensors
+*.bin
+*.pt
+*.pth
+
+# HuggingFace cache
+.cache/
+.cache/huggingface/
+huggingface/
+
+
+# =========================
+# Training Output
+# =========================
+
+outputs/
+checkpoints/
+runs/
+wandb/
+
+trainer_state.json
+training_args.bin
+optimizer.pt
+scheduler.pt
+rng_state.pth
+
+
+# =========================
+# Logs
+# =========================
+
+logs/
+*.log
+
+
+# =========================
+# Evaluation
+# =========================
+
+evaluation_results/
+reports/
+
+
+# =========================
+# IDE
+# =========================
+
+.idea/
+.vscode/
+
+
+# =========================
+# OS
+# =========================
+
+.DS_Store
+Thumbs.db
+
+
+# =========================
+# Jupyter
+# =========================
+
+.ipynb_checkpoints/

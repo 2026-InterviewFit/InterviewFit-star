@@ -1,0 +1,29 @@
+# LLM API
+openai
+# google-genai
+
+# Config / Validation
+pydantic
+pydantic-settings
+python-dotenv
+
+# Data
+pandas
+tqdm
+scikit-learn
+datasets>=2.20.0
+
+# Fine-tuning
+torch
+transformers>=4.45.0
+peft>=0.12.0
+trl>=0.9.0
+unsloth
+accelerate>=0.33.0
+bitsandbytes
+sentencepiece
+scipy
+
+safetensors
+huggingface_hub
+wandb
