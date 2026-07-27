@@ -15,14 +15,16 @@ class InterviewAnalysis(BaseModel):
 
 
 class EvaluationScore(BaseModel):
-    situation_score: int = Field(ge=1, le=5)
-    task_score: int = Field(ge=1, le=5)
-    action_score: int = Field(ge=1, le=5)
-    result_score: int = Field(ge=1, le=5)
+    situation_score: int = Field(ge=0, le=5)
+    task_score: int = Field(ge=0, le=5)
+    action_score: int = Field(ge=0, le=5)
+    result_score: int = Field(ge=0, le=5)
 
-    strengths_score: int = Field(ge=1, le=5)
-    improvements_score: int = Field(ge=1, le=5)
+    strengths_score: int = Field(ge=0, le=5)
+    improvements_score: int = Field(ge=0, le=5)
 
-    overall_score: int = Field(ge=1, le=5)
+    overall_score: int = Field(ge=0, le=5)
+
+    is_correct: int = Field(ge=0, le=1)
 
     feedback: str
