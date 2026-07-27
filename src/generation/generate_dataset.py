@@ -1,5 +1,6 @@
 import json
 import time
+from datetime import datetime
 
 import os
 import pandas as pd
@@ -10,7 +11,13 @@ from src.generation.llm_client import generate
 from src.config.config import settings
 
 
-def generate_dataset(input_path, output_path, sample_size=None, save_interval=100):
+def generate_dataset(
+    input_path,
+    output_path,
+    processed_path=None,
+    sample_size=None,
+    save_interval=20
+):
     df = pd.read_csv(input_path)
 
     if sample_size:
@@ -18,9 +25,12 @@ def generate_dataset(input_path, output_path, sample_size=None, save_interval=10
 
     results = []
 
-    # 기존 파일 있으면 이어쓰기 가능
-    if os.path.exists(output_path):
-        existing_df = pd.read_csv(output_path)
+    # skip 기준 파일
+    check_path = processed_path or output_path
+
+    # 이어쓰기
+    if os.path.exists(check_path):
+        existing_df = pd.read_csv(check_path)
         processed_answers = set(existing_df["answer"])
     else:
         processed_answers = set()
@@ -53,7 +63,7 @@ def generate_dataset(input_path, output_path, sample_size=None, save_interval=10
         if len(results) >= save_interval:
             save_results(results,output_path)
 
-            print(f"\n\n{idx}번째까지 저장 완료")
+            print(f"\n\n{idx + 1}번째까지 저장 완료 - {datetime.now()}")
 
             results.clear()
 
@@ -72,11 +82,21 @@ def parse_analysis(output: str):
 
 
 def create_result_row(row, output_json):
-    star_result = {
-        "star": output_json["star"],
-        "strengths": output_json["strengths"],
-        "improvements": output_json["improvements"]
+    star = output_json.get("star") or output_json.get("Star") or output_json.get("STAR") or {}
+
+    normalized_star = {
+        "situation": star.get("situation") or star.get("Situation") or star.get("SITUATION", ""),
+        "task": star.get("task") or star.get("Task") or star.get("TASK", ""),
+        "action": star.get("action") or star.get("Action") or star.get("ACTION", ""),
+        "result": star.get("result") or star.get("Result") or star.get("RESULT", ""),
     }
+
+    star_result = {
+        "star": normalized_star,
+        "strengths": output_json.get("strengths") or output_json.get("Strengths") or output_json.get("STRENGTHS") or [],
+        "improvements": output_json.get("improvements") or output_json.get("Improvements") or output_json.get("IMPROVEMENTS") or []
+    }
+
     return {
         "occupation": row["occupation"],
         "occupation_code": row["occupation_code"],
@@ -84,7 +104,7 @@ def create_result_row(row, output_json):
         "question": row["question"],
         "answer": row["answer"],
         "summary": row["summary"],
-        "is_star_applicable": output_json["is_star_applicable"],
+        "is_star_applicable": output_json.get("is_star_applicable"),
         "star_analysis": json.dumps(
             star_result,
             ensure_ascii=False
