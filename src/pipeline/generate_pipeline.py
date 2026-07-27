@@ -6,13 +6,15 @@ from src.validation.validate_dataset import validate_dataset
 from src.validation.statistics import analyze_dataset
 
 
-TEST_SAMPLE_SIZE = 5
+# 테스트용
+TEST_SAMPLE_SIZE = 2
 def run_test_generation_pipeline():
     create_directories()
     generate_dataset(
         settings.TRAIN_INPUT_PATH,
         settings.GENERATED_TRAIN_PATH,
-        sample_size=TEST_SAMPLE_SIZE
+        sample_size=TEST_SAMPLE_SIZE,
+        save_interval=1
     )
     validate_dataset(
         settings.GENERATED_TRAIN_PATH,
@@ -86,13 +88,75 @@ def run_generation_pipeline():
     analyze_dataset(
         settings.VALIDATED_TRAIN_PATH,
         "train",
-        settings.REPORT_DIR / "train_analysis.json"
+        settings.VALIDATED_DATA_REPORT_DIR / "train_analysis.json"
     )
 
     analyze_dataset(
         settings.VALIDATED_VALIDATION_PATH,
         "validation",
-        settings.REPORT_DIR / "validation_analysis.json"
+        settings.VALIDATED_DATA_REPORT_DIR / "validation_analysis.json"
+    )
+
+    print("=" * 60)
+    print("Pipeline Finished")
+    print("=" * 60)
+
+
+def run_generation_pipeline_missing():
+    print("=" * 60)
+    print("2. Generate train dataset")
+    print("=" * 60)
+
+    generate_dataset(
+        settings.TRAIN_INPUT_PATH,
+        settings.GENERATED_TRAIN_PATH,
+        processed_path=settings.VALIDATED_TRAIN_PATH,
+        sample_size=TEST_SAMPLE_SIZE,
+        save_interval=1
+    )
+
+    print("=" * 60)
+    print("3. Generate validation dataset")
+    print("=" * 60)
+
+    generate_dataset(
+        settings.VALIDATION_INPUT_PATH,
+        settings.GENERATED_VALIDATION_PATH,
+        processed_path=settings.VALIDATED_VALIDATION_PATH
+    )
+
+    print("=" * 60)
+    print("4. Validate train dataset")
+    print("=" * 60)
+
+    validate_dataset(
+        settings.GENERATED_TRAIN_PATH,
+        settings.VALIDATED_TRAIN_PATH,
+    )
+
+    print("=" * 60)
+    print("5. Validate validation dataset")
+    print("=" * 60)
+
+    validate_dataset(
+        settings.GENERATED_VALIDATION_PATH,
+        settings.VALIDATED_VALIDATION_PATH,
+    )
+
+    print("=" * 60)
+    print("6. Analyze dataset")
+    print("=" * 60)
+
+    analyze_dataset(
+        settings.VALIDATED_TRAIN_PATH,
+        "train",
+        settings.VALIDATED_DATA_REPORT_DIR / "train_analysis.json"
+    )
+
+    analyze_dataset(
+        settings.VALIDATED_VALIDATION_PATH,
+        "validation",
+        settings.VALIDATED_DATA_REPORT_DIR / "validation_analysis.json"
     )
 
     print("=" * 60)
@@ -101,5 +165,6 @@ def run_generation_pipeline():
 
 
 if __name__ == "__main__":
-    run_test_generation_pipeline()
+    # run_test_generation_pipeline()
     # run_generation_pipeline()
+    run_generation_pipeline_missing()
