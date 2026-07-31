@@ -1,7 +1,7 @@
 import time
 from openai import OpenAI, OpenAIError
 
-from src.generation.prompts.system import SYSTEM_PROMPT
+from src.data_pipeline.generation.prompts.system import SYSTEM_PROMPT
 from src.config.config import settings
 
 

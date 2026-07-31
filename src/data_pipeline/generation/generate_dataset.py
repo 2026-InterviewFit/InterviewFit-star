@@ -6,8 +6,8 @@ import os
 import pandas as pd
 from tqdm import tqdm
 
-from src.generation.prompts.interview import create_prompt
-from src.generation.llm_client import generate
+from src.data_pipeline.generation.prompts.interview import create_prompt
+from src.data_pipeline.generation.llm_client import generate
 from src.config.config import settings
 
 
