@@ -1,30 +1,9 @@
 from src.config.directory import create_directories
 from src.config.config import settings
 
-from src.generation.generate_dataset import generate_dataset
-from src.validation.validate_dataset import validate_dataset
-from src.validation.statistics import analyze_dataset
-
-
-# 테스트용
-TEST_SAMPLE_SIZE = 2
-def run_test_generation_pipeline():
-    create_directories()
-    generate_dataset(
-        settings.TRAIN_INPUT_PATH,
-        settings.GENERATED_TRAIN_PATH,
-        sample_size=TEST_SAMPLE_SIZE,
-        save_interval=1
-    )
-    validate_dataset(
-        settings.GENERATED_TRAIN_PATH,
-        settings.VALIDATED_TRAIN_PATH,
-    )
-    analyze_dataset(
-        settings.VALIDATED_TRAIN_PATH,
-        "train",
-        settings.VALIDATED_DATA_REPORT_DIR / "train_analysis.json"
-    )
+from src.data_pipeline.generation.generate_dataset import generate_dataset
+from src.data_pipeline.validation.validate_dataset import validate_dataset
+from src.data_pipeline.validation.statistics import analyze_dataset
 
 
 def run_generation_pipeline():
@@ -111,8 +90,6 @@ def run_generation_pipeline_missing():
         settings.TRAIN_INPUT_PATH,
         settings.GENERATED_TRAIN_PATH,
         processed_path=settings.VALIDATED_TRAIN_PATH,
-        sample_size=TEST_SAMPLE_SIZE,
-        save_interval=1
     )
 
     print("=" * 60)
@@ -165,6 +142,5 @@ def run_generation_pipeline_missing():
 
 
 if __name__ == "__main__":
-    # run_test_generation_pipeline()
-    # run_generation_pipeline()
+    run_generation_pipeline()
     run_generation_pipeline_missing()
