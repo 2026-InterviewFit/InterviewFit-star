@@ -15,15 +15,16 @@ datasets>=2.20.0
 
 # Fine-tuning
 torch
-transformers>=4.45.0
-peft>=0.12.0
-trl>=0.9.0
-unsloth
+transformers==4.52.4
+peft>=0.15.0
+trl==0.19.1
 accelerate>=0.33.0
 bitsandbytes
 sentencepiece
+safetensors
+unsloth
+unsloth_zoo
 scipy
 
-safetensors
 huggingface_hub
 wandb

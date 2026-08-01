@@ -110,18 +110,18 @@ class Settings(BaseSettings):
     # =====================
     # Training
     # =====================
-    MODEL_NAME: str = "Qwen/Qwen3-4B" # "Qwen/Qwen3-8B"
+    MODEL_NAME: str = "Qwen/Qwen3-4B"
     OUTPUT_DIR: Path = (
         BASE_DIR /
         "outputs"
     )
     SAVE_MODEL_PATH: Path = (
         BASE_DIR /
-        "models/qwen3-lora"
+        "models/qwen3-4b-star-qlora-r16"
     )
     NUM_EPOCHS: int = 3
-    BATCH_SIZE: int = 2
-    GRAD_ACCUMULATION: int = 4
+    BATCH_SIZE: int = 1
+    GRAD_ACCUMULATION: int = 8
     LEARNING_RATE: float = 2e-4
 
     # =====================
