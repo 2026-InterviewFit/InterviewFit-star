@@ -36,6 +36,21 @@ def print_star(star_text):
         print("\nResult:")
         print(star.get("result", ""))
 
+        strengths = data.get("strengths", [])
+        print("\nStrengths:")
+        if strengths:
+            for strength in strengths:
+                print(f"- {strength}")
+        else:
+            print("")
+
+        improvements = data.get("improvements", [])
+        print("\nImprovements:")
+        if improvements:
+            for improvement in improvements:
+                print(f"- {improvement}")
+        else:
+            print("")
     except Exception:
         print(star_text)
 
