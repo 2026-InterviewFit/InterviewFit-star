@@ -47,6 +47,42 @@ class Settings(BaseSettings):
     )
 
     # =====================
+    # Data Split
+    # =====================
+    SPLIT_TRAIN_DIR: Path = (
+            BASE_DIR /
+            "data/split/train"
+    )
+
+    SPLIT_VALIDATION_DIR: Path = (
+            BASE_DIR /
+            "data/split/validation"
+    )
+
+    # =====================
+    # Dataset Review
+    # =====================
+    REVIEWED_TRAIN_DIR: Path = (
+            BASE_DIR /
+            "data/reviewed/train"
+    )
+
+    REVIEWED_VALIDATION_DIR: Path = (
+            BASE_DIR /
+            "data/reviewed/validation"
+    )
+
+    REVIEWED_TRAIN_MERGED_PATH: Path = (
+            BASE_DIR /
+            "data/reviewed/train_reviewed.csv"
+    )
+
+    REVIEWED_VALIDATION_MERGED_PATH: Path = (
+            BASE_DIR /
+            "data/reviewed/validation_reviewed.csv"
+    )
+
+    # =====================
     # LLM API
     # =====================
     OPENAI_API_KEY: str = ""

@@ -23,6 +23,9 @@ data/generated/
 data/processed/
 data/validated/
 
+data/split/
+data/reviewed/
+
 # Validation reports
 data/reports/
 
