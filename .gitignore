@@ -54,6 +54,14 @@ adapters/
 # Merged models
 merged_model/
 
+# Unsloth
+unsloth_compiled_cache/
+unsloth_cache/
+
+# Fine-tuning outputs
+outputs/
+checkpoints/
+
 # Model weights
 *.safetensors
 *.bin

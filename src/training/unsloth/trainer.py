@@ -58,7 +58,7 @@ def create_unsloth_trainer(model, tokenizer):
         gradient_accumulation_steps=settings.GRAD_ACCUMULATION,
         learning_rate=settings.LEARNING_RATE,
         logging_steps=10,
-        save_strategy="epoch",
+        # save_strategy="epoch",
         evaluation_strategy="epoch",
         save_total_limit=3,
         fp16=not is_bfloat16_supported(),

@@ -5,6 +5,11 @@ from src.config.config import settings
 
 
 REMOVE_COLUMNS = [
+    "occupation",
+    "occupation_code",
+    "experience",
+    "summary",
+    "is_star_applicable",
     "review_status",
     "prompt_version",
     "model"
@@ -29,8 +34,8 @@ def merge_reviewed_dataset(
             encoding="utf-8-sig"
         )
 
-        # KEEP 데이터만 유지
-        df = df[df["review_status"] == "KEEP"]
+        # KEEP과 HOLD 데이터 유지
+        df = df[df["review_status"].isin(["KEEP", "HOLD"])]
 
         # 검수/생성 메타데이터 제거
         df = df.drop(

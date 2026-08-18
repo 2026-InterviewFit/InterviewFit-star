@@ -11,11 +11,11 @@ from src.preprocess.convert_dataset import (
 def run_preprocess_pipeline():
     # train 데이터 그대로 사용
     train_dataset = convert_csv_to_dataset(
-        settings.VALIDATED_TRAIN_PATH
+        settings.REVIEWED_TRAIN_MERGED_PATH
     )
     # validation → valid/test 분리
     validation_dataset = convert_csv_to_dataset(
-        settings.VALIDATED_VALIDATION_PATH
+        settings.REVIEWED_VALIDATION_MERGED_PATH
     )
 
     valid_dataset, test_dataset = train_test_split(

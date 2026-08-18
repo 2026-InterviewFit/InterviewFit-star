@@ -17,12 +17,12 @@ def build_sample(row):
         if not validate_analysis(output):
             return None
     except Exception as e:
-        print(e)
+        print(f"Failed to build sample: {e}")
         return None
 
     user_prompt = (
-        f"질문:\n{row['question']}\n\n"
-        f"답변:\n{row['answer']}"
+        f"### 질문:\n{row['question']}\n\n"
+        f"### 답변:\n{row['answer']}"
     )
 
     return {
