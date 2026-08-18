@@ -43,15 +43,15 @@ def parse_messages(messages):
 
 
 def parse_user_content(content):
-    question_start = content.index(
-        "질문:"
-    )
-    answer_start = content.index(
-        "답변:"
-    )
+    question_marker = "### 질문:"
+    answer_marker = "### 답변:"
+
+    question_start = content.index(question_marker)
+    answer_start = content.index(answer_marker)
+
     question = (
         content[
-            question_start + 3:
+            question_start + len(question_marker):
             answer_start
         ]
         .strip()
@@ -59,7 +59,7 @@ def parse_user_content(content):
 
     answer = (
         content[
-            answer_start + 3:
+            answer_start + len(answer_marker):
         ]
         .strip()
     )

@@ -109,7 +109,6 @@ if __name__ == "__main__":
             "improvements_score": 4,
             "overall_score": 5,
             "is_correct": 1,
-            "feedback": "우수한 답변입니다."
         },
         {
             "situation_score": 4,
@@ -120,7 +119,6 @@ if __name__ == "__main__":
             "improvements_score": 4,
             "overall_score": 4,
             "is_correct": 1,
-            "feedback": "Result가 조금 부족합니다."
         }
     ]
     summary = calculate_metrics(
