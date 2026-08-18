@@ -1,20 +1,19 @@
+import torch
 from transformers import (
     AutoTokenizer,
-    AutoModelForCausalLM,
-    TrainingArguments,
+    AutoModelForCausalLM, BitsAndBytesConfig,
 )
-
 from peft import get_peft_model
-
-from trl import SFTTrainer
+from trl import SFTTrainer, SFTConfig
 
 from src.config.config import settings
 
 from src.training.common.dataset import load_datasets
 from src.training.common.lora_config import get_peft_lora_config
+from src.training.common.save_model import SaveEpochCallback
 
 
-MAX_SEQ_LENGTH = 4096
+MAX_SEQ_LENGTH = 1280
 
 
 def load_transformers_model():
@@ -22,10 +21,17 @@ def load_transformers_model():
         settings.MODEL_NAME
     )
 
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_use_double_quant=True,
+    )
+
     model = AutoModelForCausalLM.from_pretrained(
         settings.MODEL_NAME,
-        device_map="auto",
-        torch_dtype="auto",
+        quantization_config=bnb_config,
+        device_map={"": 0},
     )
 
     return model, tokenizer
@@ -37,6 +43,11 @@ def apply_peft_lora(model):
         get_peft_lora_config()
     )
 
+    model.gradient_checkpointing_enable()
+    model.enable_input_require_grads()
+
+    model.print_trainable_parameters()
+
     return model
 
 
@@ -47,39 +58,39 @@ def create_transformers_trainer(model, tokenizer):
         settings.VALID_PATH,
     )
 
+    training_args = SFTConfig(
+        output_dir=settings.OUTPUT_DIR,
+        num_train_epochs=settings.NUM_EPOCHS,
+        per_device_train_batch_size=settings.BATCH_SIZE,
+        gradient_accumulation_steps=settings.GRAD_ACCUMULATION,
+        learning_rate=settings.LEARNING_RATE,
+        logging_steps=10,
+        # save_strategy="epoch",
+        eval_strategy="epoch",
+        # save_total_limit=3,
+        bf16=True,
+        optim="adamw_torch",
+        lr_scheduler_type="cosine",
+        weight_decay=0.01,
+        warmup_ratio=0.03,
+        max_length=MAX_SEQ_LENGTH,
+        packing=False,
+        report_to="wandb",
+    )
+
     trainer = SFTTrainer(
         model=model,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         train_dataset=datasets["train"],
         eval_dataset=datasets["validation"],
-        dataset_text_field="text",
-        max_seq_length=MAX_SEQ_LENGTH,
-        packing=False,
-        args=TrainingArguments(
-            output_dir=settings.OUTPUT_DIR,
-            num_train_epochs=settings.NUM_EPOCHS,
-            per_device_train_batch_size=settings.BATCH_SIZE,
-            gradient_accumulation_steps=settings.GRAD_ACCUMULATION,
-            learning_rate=settings.LEARNING_RATE,
-            logging_steps=10,
-            save_strategy="epoch",
-            evaluation_strategy="epoch",
-            bf16=True,
-            optim="adamw_torch",
-            lr_scheduler_type="cosine",
-            weight_decay=0.01,
-            warmup_ratio=0.03,
-        ),
+        args=training_args,
+    )
+
+    trainer.add_callback(
+        SaveEpochCallback(
+            tokenizer,
+            settings.SAVE_MODEL_PATH,
+        )
     )
 
     return trainer
-
-
-def save_transformers_model(model, tokenizer):
-    model.save_pretrained(
-        settings.SAVE_MODEL_PATH
-    )
-
-    tokenizer.save_pretrained(
-        settings.SAVE_MODEL_PATH
-    )

@@ -23,8 +23,8 @@ def load_datasets(tokenizer, train_path, valid_path):
     datasets = load_dataset(
         "json",
         data_files={
-            "train": train_path,
-            "validation": valid_path,
+            "train": str(train_path),
+            "validation": str(valid_path),
         }
     )
 
@@ -32,6 +32,7 @@ def load_datasets(tokenizer, train_path, valid_path):
         datasets["train"],
         tokenizer,
     )
+
     datasets["validation"] = apply_chat_template(
         datasets["validation"],
         tokenizer,

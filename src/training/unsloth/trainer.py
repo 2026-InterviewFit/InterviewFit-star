@@ -1,3 +1,8 @@
+import os
+
+os.environ["UNSLOTH_DISABLE_FAST_GENERATION"] = "1"
+os.environ["UNSLOTH_DISABLE_XFORMERS"] = "1"
+
 from unsloth import FastLanguageModel
 from unsloth import is_bfloat16_supported
 
@@ -8,7 +13,8 @@ from src.config.config import settings
 
 from src.training.common.dataset import load_datasets
 from src.training.common.lora_config import get_unsloth_lora_config
-from src.training.unsloth.save_unsloth_model import SaveEpochCallback
+from src.training.common.save_model import SaveEpochCallback
+
 
 MAX_SEQ_LENGTH = 2048
 
@@ -19,6 +25,7 @@ def load_unsloth_model():
         max_seq_length=MAX_SEQ_LENGTH,
         load_in_4bit=True,
         dtype=None,
+        attn_implementation="sdpa",
     )
 
     # print(tokenizer.chat_template)
@@ -51,6 +58,7 @@ def create_unsloth_trainer(model, tokenizer):
         settings.TRAIN_PATH,
         settings.VALID_PATH,
     )
+
     training_args = TrainingArguments(
         output_dir=settings.OUTPUT_DIR,
         num_train_epochs=settings.NUM_EPOCHS,
@@ -59,7 +67,7 @@ def create_unsloth_trainer(model, tokenizer):
         learning_rate=settings.LEARNING_RATE,
         logging_steps=10,
         # save_strategy="epoch",
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         save_total_limit=3,
         fp16=not is_bfloat16_supported(),
         bf16=is_bfloat16_supported(),
