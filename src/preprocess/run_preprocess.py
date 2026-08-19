@@ -2,10 +2,7 @@ from sklearn.model_selection import train_test_split
 
 from src.config.config import settings
 
-from src.preprocess.convert_dataset import (
-    convert_csv_to_dataset,
-    save_jsonl
-)
+from src.preprocess.convert_dataset import convert_csv_to_dataset, save_jsonl
 
 
 def run_preprocess_pipeline():

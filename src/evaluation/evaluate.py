@@ -6,10 +6,7 @@ from tqdm import tqdm
 from src.config.config import settings
 from src.inference.inference import predict
 from src.evaluation.judge import judge
-from src.evaluation.metrics import (
-    calculate_metrics,
-    print_summary,
-)
+from src.evaluation.metrics import calculate_metrics
 
 
 RESULT_PATH = settings.REPORT_DIR / "result.csv"
@@ -21,7 +18,6 @@ def load_test_dataset():
         settings.TEST_PATH,
         encoding="utf-8",
     ) as f:
-
         return [
             json.loads(line)
             for line in f
@@ -35,7 +31,6 @@ def parse_messages(messages):
     for message in messages:
         if message["role"] == "user":
             user_content = message["content"]
-
         elif message["role"] == "assistant":
             assistant_content = message["content"]
 
@@ -73,75 +68,68 @@ def run_evaluation():
     results = []
     judge_results = []
 
-    for sample in tqdm(
-            dataset,
-            desc="Evaluating"
-    ):
-        user_content, assistant_content = parse_messages(
-            sample["messages"]
-        )
+    for index, sample in enumerate(tqdm(dataset, desc="Evaluating"), start=1,):
+        user_content, assistant_content = parse_messages(sample["messages"])
 
         if user_content is None or assistant_content is None:
             continue
 
         try:
-            ground_truth = json.loads(
-                assistant_content
-            )
+            ground_truth = json.loads(assistant_content)
         except json.JSONDecodeError:
             continue
 
-        question, answer = parse_user_content(
-            user_content
-        )
+        try:
+            question, answer = parse_user_content(user_content)
+        except ValueError:
+            continue
+
         prediction = predict(
             question,
             answer,
         )
 
         if "error" in prediction:
-            score = {
-                "situation_score": 0,
-                "task_score": 0,
-                "action_score": 0,
-                "result_score": 0,
-                "strengths_score": 0,
-                "improvements_score": 0,
-                "overall_score": 0,
-
-                "is_correct": 0,
-
-                "feedback": "Invalid JSON output"
-            }
+            judge_score = None
+            judge_feedback = "Prediction failed."
+            status = "prediction_error"
         else:
-            score = judge(
-                ground_truth,
-                prediction,
-            )
-
-        judge_results.append(
-            score
-        )
+            try:
+                judge_result = judge(
+                    ground_truth,
+                    prediction,
+                )
+                judge_score = judge_result["score"]
+                judge_feedback = judge_result["feedback"]
+                judge_results.append(
+                    judge_result
+                )
+                status = "success"
+            except Exception as e:
+                judge_score = None
+                judge_feedback = str(e)
+                status = "judge_error"
 
         results.append(
             {
-                "question":question,
-                "answer":answer,
-
-                "ground_truth":json.dumps(
+                "index": index,
+                "question": question,
+                "answer": answer,
+                "ground_truth": json.dumps(
                     ground_truth,
                     ensure_ascii=False,
                 ),
-
-                "prediction":json.dumps(
+                "prediction": json.dumps(
                     prediction,
                     ensure_ascii=False,
                 ),
-
-                **score,
+                "judge_score": judge_score,
+                "judge_feedback": judge_feedback,
+                "status": status,
             }
         )
 
+    # 상세 평가 결과 저장
     df = pd.DataFrame(results)
 
     df.to_csv(
@@ -150,9 +138,8 @@ def run_evaluation():
         encoding="utf-8-sig",
     )
 
-    summary = calculate_metrics(
-        judge_results
-    )
+    # 전체 평가 지표 계산
+    summary = calculate_metrics(judge_results)
 
     with open(
         SUMMARY_PATH,
@@ -165,8 +152,6 @@ def run_evaluation():
             ensure_ascii=False,
             indent=4,
         )
-
-    print_summary(summary)
 
 
 if __name__ == "__main__":
