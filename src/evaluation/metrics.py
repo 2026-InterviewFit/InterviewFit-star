@@ -1,85 +1,64 @@
 from collections import Counter
 
-from src.schema.schema import EvaluationScore
-
-
-SCORE_FIELDS = [
-    field_name
-    for field_name in EvaluationScore.model_fields
-    if field_name.endswith("_score")
-]
-
 
 def calculate_metrics(results: list[dict]) -> dict[str, int | float]:
     """
     Judge 결과를 기반으로
-    STAR 평가 점수 평균과 accuracy를 계산한다.
+    STAR 평가 점수 평균과 accuracy를 계산
     """
 
     total = len(results)
 
     if total == 0:
-        return {}
+        return {
+            "samples": 0,
+            "average_score": 0,
+            "accuracy": 0,
+        }
 
-    summary = {
-        "samples": total,
-    }
-
-    # 평균 점수 계산
-    for field in SCORE_FIELDS:
-        values = [
-            result[field]
-            for result in results
-            if field in result
-        ]
-
-        summary[f"avg_{field}"] = round(
-            sum(values) / len(values),
-            3,
-        ) if values else 0
-
-    # is_correct 계산
-    correct_count = sum(
-        int(result.get("is_correct", 0))
+    scores = [
+        result["score"]
         for result in results
-    )
+        if "score" in result
+    ]
 
-    summary["correct_count"] = correct_count
-    summary["incorrect_count"] = (
-            total - correct_count
-    )
-    summary["accuracy"] = round(
-        correct_count / total,
-        4,
-    )
-
-    return summary
-
-
-def print_summary(summary: dict):
-    print("=" * 50)
-    print("Evaluation Summary")
-    print("=" * 50)
-    print(
-        f"Samples       : {summary['samples']}"
-    )
-    print(
-        f"Correct Count : {summary['correct_count']}"
-    )
-    print(
-        f"Incorrect     : {summary['incorrect_count']}"
-    )
-    print(
-        f"Correct Rate  : "
-        f"{summary['accuracy']:.2%}"
-    )
-    print()
-
-    for field in SCORE_FIELDS:
-        print(
-            f"{field:<25}: "
-            f"{summary[f'avg_{field}']:.3f}"
+    average_score = (
+        round(
+            sum(scores) / len(scores),
+            3,
         )
+        if scores
+        else 0
+    )
+
+    # 4점 이상을 정확한 분석으로 정의
+    correct_count = sum(
+        1
+        for score in scores
+        if score >= 4
+    )
+
+    incorrect_count = (
+            len(scores) - correct_count
+    )
+
+    accuracy = (
+        round(
+            correct_count / len(scores),
+            4,
+        )
+        if scores
+        else 0
+    )
+
+    return {
+        "samples": total,
+        "evaluated_samples": len(scores),
+        "average_score": average_score,
+        "correct_count": correct_count,
+        "incorrect_count": incorrect_count,
+        "accuracy": accuracy,
+    }
 
 
 def collect_feedback(results: list[dict], top_k: int = 10,):
@@ -96,45 +75,3 @@ def collect_feedback(results: list[dict], top_k: int = 10,):
     return Counter(
         feedbacks
     ).most_common(top_k)
-
-
-if __name__ == "__main__":
-    results = [
-        {
-            "situation_score": 5,
-            "task_score": 4,
-            "action_score": 5,
-            "result_score": 4,
-            "strengths_score": 5,
-            "improvements_score": 4,
-            "overall_score": 5,
-            "is_correct": 1,
-        },
-        {
-            "situation_score": 4,
-            "task_score": 4,
-            "action_score": 4,
-            "result_score": 3,
-            "strengths_score": 4,
-            "improvements_score": 4,
-            "overall_score": 4,
-            "is_correct": 1,
-        }
-    ]
-    summary = calculate_metrics(
-        results
-    )
-    print_summary(
-        summary
-    )
-
-    print("\nSummary Dict")
-    print(summary)
-
-
-    print("\nTop Feedback")
-
-    for feedback, count in collect_feedback(results):
-        print(
-            f"{count}회 - {feedback}"
-        )

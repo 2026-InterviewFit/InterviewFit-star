@@ -1,4 +1,7 @@
 from datasets import load_dataset
+from transformers import AutoTokenizer
+
+from src.config.config import settings
 
 
 def apply_chat_template(dataset, tokenizer):
@@ -7,6 +10,12 @@ def apply_chat_template(dataset, tokenizer):
             example["messages"],
             tokenize=False,
             add_generation_prompt=False,
+            enable_thinking=False,
+        )
+
+        text = text.replace(
+            "<think>\n\n</think>\n\n",
+            ""
         )
 
         return {
@@ -39,3 +48,26 @@ def load_datasets(tokenizer, train_path, valid_path):
     )
 
     return datasets
+
+
+if __name__ == "__main__":
+    tokenizer = AutoTokenizer.from_pretrained(
+        settings.MODEL_NAME
+    )
+
+    datasets = load_dataset(
+        "json",
+        data_files={
+            "train": str(settings.TRAIN_PATH),
+            "validation": str(settings.VALID_PATH),
+        }
+    )
+
+    datasets["validation"] = apply_chat_template(
+        datasets["validation"],
+        tokenizer,
+    )
+
+    print("=" * 80)
+    print(datasets["validation"][0]["text"])
+    print("=" * 80)

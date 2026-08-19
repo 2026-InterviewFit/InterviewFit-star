@@ -126,9 +126,13 @@ class Settings(BaseSettings):
     GRAD_ACCUMULATION: int = 32
     LEARNING_RATE: float = 2e-4
 
+    MAX_SEQ_LENGTH: int = 1280 # training
+
     # =====================
     # Evaluation
     # =====================
+    MAX_NEW_TOKENS: int = 1024 # inference
+
     REPORT_DIR: Path = (
         BASE_DIR /
         "reports/evaluation"

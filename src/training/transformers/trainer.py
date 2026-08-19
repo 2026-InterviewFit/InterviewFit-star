@@ -1,8 +1,5 @@
 import torch
-from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM, BitsAndBytesConfig,
-)
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import get_peft_model
 from trl import SFTTrainer, SFTConfig
 
@@ -11,9 +8,6 @@ from src.config.config import settings
 from src.training.common.dataset import load_datasets
 from src.training.common.lora_config import get_peft_lora_config
 from src.training.common.save_model import SaveEpochCallback
-
-
-MAX_SEQ_LENGTH = 1280
 
 
 def load_transformers_model():
@@ -44,6 +38,8 @@ def apply_peft_lora(model):
     )
 
     model.gradient_checkpointing_enable()
+
+    model.config.use_cache = False
     model.enable_input_require_grads()
 
     model.print_trainable_parameters()
@@ -73,7 +69,7 @@ def create_transformers_trainer(model, tokenizer):
         lr_scheduler_type="cosine",
         weight_decay=0.01,
         warmup_ratio=0.03,
-        max_length=MAX_SEQ_LENGTH,
+        max_length=settings.MAX_SEQ_LENGTH,
         packing=False,
         report_to="wandb",
     )

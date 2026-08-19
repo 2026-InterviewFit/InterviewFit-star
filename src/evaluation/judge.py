@@ -1,3 +1,5 @@
+import json
+
 from openai import OpenAI
 from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
 
@@ -6,29 +8,65 @@ from src.schema.schema import EvaluationScore
 from src.config.config import settings
 
 
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+client = OpenAI(
+    api_key=settings.UPSTAGE_API_KEY,
+    base_url="https://api.upstage.ai/v1",
+)
 
 
-def judge(ground_truth: dict, prediction: dict,):
+def judge(ground_truth: dict, prediction: dict):
     user_prompt = create_judge_prompt(ground_truth, prediction)
 
-    response = client.chat.completions.parse(
-        model=settings.OPENAI_MODEL,
+    response = client.chat.completions.create(
+        model=settings.UPSTAGE_MODEL,
         temperature=0,
-        response_format=EvaluationScore,
+        response_format={
+            "type": "json_object"
+        },
         messages=[
-            ChatCompletionSystemMessageParam(
-                role="system",
-                content=JUDGE_SYSTEM_PROMPT,
-            ),
-            ChatCompletionUserMessageParam(
-                role="user",
-                content=user_prompt,
-            ),
+            {
+                "role": "system",
+                "content": JUDGE_SYSTEM_PROMPT,
+            },
+            {
+                "role": "user",
+                "content": user_prompt,
+            },
         ],
     )
 
-    return response.choices[0].message.parsed.model_dump()
+    content = response.choices[0].message.content
+
+    result = json.loads(content)
+
+    return EvaluationScore(
+        **result
+    ).model_dump()
+
+
+# client = OpenAI(api_key=settings.OPENAI_API_KEY)
+#
+#
+# def judge(ground_truth: dict, prediction: dict):
+#     user_prompt = create_judge_prompt(ground_truth, prediction)
+#
+#     response = client.chat.completions.parse(
+#         model=settings.OPENAI_MODEL,
+#         temperature=0,
+#         response_format=EvaluationScore,
+#         messages=[
+#             ChatCompletionSystemMessageParam(
+#                 role="system",
+#                 content=JUDGE_SYSTEM_PROMPT,
+#             ),
+#             ChatCompletionUserMessageParam(
+#                 role="user",
+#                 content=user_prompt,
+#             ),
+#         ],
+#     )
+#
+#     return response.choices[0].message.parsed.model_dump()
 
 
 if __name__ == "__main__":
@@ -62,9 +100,4 @@ if __name__ == "__main__":
         ],
     }
 
-    print(
-        judge(
-            gt,
-            pred,
-        )
-    )
+    print(judge(gt, pred))
