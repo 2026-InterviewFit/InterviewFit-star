@@ -89,7 +89,7 @@ class Settings(BaseSettings):
     OPENAI_MODEL: str = "gpt-4.1-mini"
     UPSTAGE_API_KEY: str = ""
     UPSTAGE_MODEL: str = "solar-pro3"
-    TEMPERATURE: float = 0.2
+    TEMPERATURE: float = 0.0
 
     # =====================
     # Preprocess
@@ -131,7 +131,7 @@ class Settings(BaseSettings):
     # =====================
     # Evaluation
     # =====================
-    MAX_NEW_TOKENS: int = 1024 # inference
+    MAX_NEW_TOKENS: int = 1280 # inference
 
     REPORT_DIR: Path = (
         BASE_DIR /
