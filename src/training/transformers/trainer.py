@@ -61,7 +61,7 @@ def create_transformers_trainer(model, tokenizer):
         gradient_accumulation_steps=settings.GRAD_ACCUMULATION,
         learning_rate=settings.LEARNING_RATE,
         logging_steps=10,
-        # save_strategy="epoch",
+        save_strategy="epoch",
         eval_strategy="epoch",
         # save_total_limit=3,
         bf16=True,

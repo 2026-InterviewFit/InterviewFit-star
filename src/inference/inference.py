@@ -1,4 +1,7 @@
 import json
+import time
+
+import pandas as pd
 
 import torch
 from peft import PeftModel
@@ -10,6 +13,8 @@ from src.config.config import settings
 
 _model = None
 _tokenizer = None
+
+NUM_SAMPLES = 5
 
 
 def clean_json(response: str):
@@ -114,15 +119,18 @@ def generate(
     )
 
 
-def predict(question: str, answer: str,):
-    model, tokenizer = load_model(
-        settings.SAVE_MODEL_PATH / "epoch-1"
-    )
-
+def predict(
+    model,
+    tokenizer,
+    question: str,
+    answer: str
+):
     messages = build_messages(
         question,
         answer,
     )
+
+    start_time = time.perf_counter()
 
     response = generate(
         model,
@@ -130,6 +138,10 @@ def predict(question: str, answer: str,):
         messages,
         settings.MAX_NEW_TOKENS
     )
+
+    inference_time = time.perf_counter() - start_time
+
+    print(f"\n추론 시간: {inference_time:.3f}초")
 
     try:
         cleaned_response = clean_json(response)
@@ -142,15 +154,41 @@ def predict(question: str, answer: str,):
 
 
 if __name__ == "__main__":
-    result = predict(
-        question="위기 관리 경험이 있나요.",
-        answer="위기 관리 경험이 있나요 어 라고 말씀을 주셨는데요. 어 이거 이 질문은 어 직장에서 인건지 아니면 제가 살아오는 내 인생에 있어서인건지 어떤 쪽으로 제가 답변을 드려야 될지는 조금 더 구체적인 질문이 필요로 할 것 같고요. 일단은 내 삶 속에서 내 삶에서 어 위기 관리 경험이 있냐 라고 생각하고 말씀을 드린다면 제 삶 속에서 투자를 한 번 잘못해서 어 많은 돈을 어 날린 적이 있습니다. 그때 저희 가정이 어 파탄나지 않을까 또 제가 저의 그 생명에 위험하지 않을까 즉 나의 자존심이 허락지 않아서 제가 정말로 자살을 하고 싶을 정도의 어떤 그런 좌절한 적이 좌절감이 있었는데 그래도 저의 그 긍정적이고 음 어떤 그 지혜로운 어떤 그 생각이 저를 다시 살게했고 그런 에너지들이 저에게 다시 기회를 주셨고 그래서 지금 이 자리에 있게 된 거 이런 경험이 있습니다. 모든 것에 감사합니다. 이상입니다.",
-    )
+    df = pd.read_csv(settings.REVIEWED_VALIDATION_MERGED_PATH)
+    samples = df.head(NUM_SAMPLES)
 
-    print(
-        json.dumps(
-            result,
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
+    for epoch in range(1, 6):
+        print(f"\n{'=' * 30}")
+        print(f"Epoch {epoch}")
+        print(f"{'=' * 30}")
+
+        # Epoch별 모델을 한 번만 로드
+        model, tokenizer = load_model(settings.SAVE_MODEL_PATH / f"epoch-{epoch}")
+
+        for index, row in samples.iterrows():
+            question = row["question"]
+            answer = row["answer"]
+
+            print(f"\n--- Sample {index} ---")
+            print(f"질문: {question}")
+            print(f"답변: {answer}")
+
+            result = predict(
+                model=model,
+                tokenizer=tokenizer,
+                question=question,
+                answer=answer,
+            )
+
+            print(
+                json.dumps(
+                    result,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+
+        # 다음 Epoch 모델을 위해 현재 모델 정리
+        del model
+        del tokenizer
+        torch.cuda.empty_cache()
