@@ -40,7 +40,7 @@ def generate_dataset(
         if row["answer"] in processed_answers:
             continue
 
-        prompt = create_prompt(row["answer"])
+        prompt = create_prompt(row["question"], row["answer"])
         output = generate(prompt)
 
         time.sleep(2)
