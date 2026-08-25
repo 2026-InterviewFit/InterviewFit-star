@@ -77,6 +77,7 @@ def sample_validated_dataset(
 
 if __name__ == "__main__":
     print_validated_dataset(settings.VALIDATED_TRAIN_PATH)
+    print_validated_dataset(settings.VALIDATED_VALIDATION_PATH)
 
     sample_validated_dataset(
         input_path=settings.VALIDATED_TRAIN_PATH,
