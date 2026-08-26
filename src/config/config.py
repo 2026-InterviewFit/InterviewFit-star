@@ -45,6 +45,15 @@ class Settings(BaseSettings):
             BASE_DIR /
             "reports/validated_reports"
     )
+    FILTERED_VALIDATED_TRAIN_PATH: Path = (
+            BASE_DIR /
+            "data/validated/train_validated_filtered.csv"
+    )
+
+    FILTERED_VALIDATED_VALIDATION_PATH: Path = (
+            BASE_DIR /
+            "data/validated/validation_validated_filtered.csv"
+    )
 
     # =====================
     # Data Split
