@@ -1,16 +1,14 @@
 import json
 
+import torch
 import pandas as pd
 from tqdm import tqdm
 
+from inference.inference import load_model
 from src.config.config import settings
 from src.inference.inference import predict
 from src.evaluation.judge import judge
 from src.evaluation.metrics import calculate_metrics
-
-
-RESULT_PATH = settings.REPORT_DIR / "result.csv"
-SUMMARY_PATH = settings.REPORT_DIR / "summary.json"
 
 
 def load_test_dataset():
@@ -62,13 +60,19 @@ def parse_user_content(content):
     return question, answer
 
 
-def run_evaluation():
+def run_evaluation(checkpoint_path):
     dataset = load_test_dataset()
+
+    print("=" * 50)
+    print("Evaluating Best Model")
+    print("=" * 50)
+
+    model, tokenizer = load_model(checkpoint_path)
 
     results = []
     judge_results = []
 
-    for index, sample in enumerate(tqdm(dataset, desc="Evaluating"), start=1,):
+    for index, sample in enumerate(tqdm(dataset, desc="Evaluating Best Model"), start=1):
         user_content, assistant_content = parse_messages(sample["messages"])
 
         if user_content is None or assistant_content is None:
@@ -85,6 +89,8 @@ def run_evaluation():
             continue
 
         prediction = predict(
+            model,
+            tokenizer,
             question,
             answer,
         )
@@ -133,7 +139,7 @@ def run_evaluation():
     df = pd.DataFrame(results)
 
     df.to_csv(
-        RESULT_PATH,
+        settings.REPORT_DIR / f"result.csv",
         index=False,
         encoding="utf-8-sig",
     )
@@ -142,9 +148,9 @@ def run_evaluation():
     summary = calculate_metrics(judge_results)
 
     with open(
-        SUMMARY_PATH,
-        "w",
-        encoding="utf-8",
+            settings.REPORT_DIR / f"summary.json",
+            "w",
+            encoding="utf-8",
     ) as f:
         json.dump(
             summary,
@@ -155,4 +161,5 @@ def run_evaluation():
 
 
 if __name__ == "__main__":
-    run_evaluation()
+    checkpoint_path = settings.OUTPUT_DIR / "checkpoint-xxxx" # 실제 best checkpoint 사용하기
+    run_evaluation(checkpoint_path)

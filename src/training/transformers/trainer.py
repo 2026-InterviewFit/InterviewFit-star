@@ -26,6 +26,7 @@ def load_transformers_model():
         settings.MODEL_NAME,
         quantization_config=bnb_config,
         device_map={"": 0},
+        attn_implementation="sdpa",
     )
 
     return model, tokenizer
@@ -60,12 +61,15 @@ def create_transformers_trainer(model, tokenizer):
         per_device_train_batch_size=settings.BATCH_SIZE,
         gradient_accumulation_steps=settings.GRAD_ACCUMULATION,
         learning_rate=settings.LEARNING_RATE,
-        logging_steps=10,
+        logging_steps=20,
         save_strategy="epoch",
         eval_strategy="epoch",
+        load_best_model_at_end=True,
+        metric_for_best_model="eval_loss",
+        greater_is_better=False,
         # save_total_limit=3,
         bf16=True,
-        optim="adamw_torch",
+        optim="paged_adamw_8bit",
         lr_scheduler_type="cosine",
         weight_decay=0.01,
         warmup_ratio=0.03,
@@ -82,11 +86,11 @@ def create_transformers_trainer(model, tokenizer):
         args=training_args,
     )
 
-    trainer.add_callback(
-        SaveEpochCallback(
-            tokenizer,
-            settings.SAVE_MODEL_PATH,
-        )
-    )
+    # trainer.add_callback(
+    #     SaveEpochCallback(
+    #         tokenizer,
+    #         settings.SAVE_MODEL_PATH,
+    #     )
+    # )
 
     return trainer

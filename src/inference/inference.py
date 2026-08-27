@@ -11,8 +11,6 @@ from src.inference.prompts.inference_prompt import INFERENCE_SYSTEM_PROMPT, crea
 from src.config.config import settings
 
 
-_model = None
-_tokenizer = None
 
 NUM_SAMPLES = 5
 
@@ -29,12 +27,7 @@ def clean_json(response: str):
 
 
 def load_model(model_path):
-    global _model, _tokenizer
-
-    if _model is not None and _tokenizer is not None:
-        return _model, _tokenizer
-
-    _tokenizer = AutoTokenizer.from_pretrained(model_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
 
     nb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -47,25 +40,26 @@ def load_model(model_path):
         settings.MODEL_NAME,
         quantization_config=nb_config,
         device_map="cuda",
+        attn_implementation="sdpa",
     )
 
     # Inference: KV Cache ON
     base_model.config.use_cache = True
 
-    _model = PeftModel.from_pretrained(
+    model = PeftModel.from_pretrained(
         base_model,
         model_path,
     )
 
-    _model.eval()
+    model.eval()
 
     print("GPU:", torch.cuda.get_device_name(0))
     print("VRAM total:", torch.cuda.get_device_properties(0).total_memory / 1024 ** 3, "GB")
     print("VRAM allocated:", torch.cuda.memory_allocated() / 1024 ** 3, "GB")
     print("VRAM reserved:", torch.cuda.memory_reserved() / 1024 ** 3, "GB")
-    print(_model.hf_device_map)
+    print(model.hf_device_map)
 
-    return _model, _tokenizer
+    return model, tokenizer
 
 
 def build_messages(question: str, answer: str,):
@@ -154,41 +148,32 @@ def predict(
 
 
 if __name__ == "__main__":
+    checkpoint_path = settings.OUTPUT_DIR / "checkpoint-xxxx" # 실제 best checkpoint 사용하기
+
+    model, tokenizer = load_model(checkpoint_path)
+
     df = pd.read_csv(settings.REVIEWED_VALIDATION_MERGED_PATH)
     samples = df.head(NUM_SAMPLES)
 
-    for epoch in range(1, 6):
-        print(f"\n{'=' * 30}")
-        print(f"Epoch {epoch}")
-        print(f"{'=' * 30}")
+    for index, row in samples.iterrows():
+        question = row["question"]
+        answer = row["answer"]
 
-        # Epoch별 모델을 한 번만 로드
-        model, tokenizer = load_model(settings.SAVE_MODEL_PATH / f"epoch-{epoch}")
+        print(f"\n--- Sample {index} ---")
+        print(f"질문: {question}")
+        print(f"답변: {answer}")
 
-        for index, row in samples.iterrows():
-            question = row["question"]
-            answer = row["answer"]
+        result = predict(
+            model=model,
+            tokenizer=tokenizer,
+            question=question,
+            answer=answer,
+        )
 
-            print(f"\n--- Sample {index} ---")
-            print(f"질문: {question}")
-            print(f"답변: {answer}")
-
-            result = predict(
-                model=model,
-                tokenizer=tokenizer,
-                question=question,
-                answer=answer,
+        print(
+            json.dumps(
+                result,
+                ensure_ascii=False,
+                indent=2,
             )
-
-            print(
-                json.dumps(
-                    result,
-                    ensure_ascii=False,
-                    indent=2,
-                )
-            )
-
-        # 다음 Epoch 모델을 위해 현재 모델 정리
-        del model
-        del tokenizer
-        torch.cuda.empty_cache()
+        )
