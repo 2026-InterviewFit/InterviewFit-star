@@ -49,7 +49,6 @@ class Settings(BaseSettings):
             BASE_DIR /
             "data/validated/train_validated_filtered.csv"
     )
-
     FILTERED_VALIDATED_VALIDATION_PATH: Path = (
             BASE_DIR /
             "data/validated/validation_validated_filtered.csv"
@@ -62,7 +61,6 @@ class Settings(BaseSettings):
             BASE_DIR /
             "data/split/train"
     )
-
     SPLIT_VALIDATION_DIR: Path = (
             BASE_DIR /
             "data/split/validation"
@@ -75,17 +73,14 @@ class Settings(BaseSettings):
             BASE_DIR /
             "data/reviewed/train"
     )
-
     REVIEWED_VALIDATION_DIR: Path = (
             BASE_DIR /
             "data/reviewed/validation"
     )
-
     REVIEWED_TRAIN_MERGED_PATH: Path = (
             BASE_DIR /
             "data/reviewed/train_reviewed.csv"
     )
-
     REVIEWED_VALIDATION_MERGED_PATH: Path = (
             BASE_DIR /
             "data/reviewed/validation_reviewed.csv"
@@ -130,7 +125,8 @@ class Settings(BaseSettings):
         BASE_DIR /
         "models/qwen3-4b-star-qlora-r16"
     )
-    NUM_EPOCHS: int = 3
+
+    NUM_EPOCHS: int = 1
     BATCH_SIZE: int = 1
     GRAD_ACCUMULATION: int = 32
     LEARNING_RATE: float = 2e-4
@@ -140,12 +136,14 @@ class Settings(BaseSettings):
     # =====================
     # Evaluation
     # =====================
-    MAX_NEW_TOKENS: int = 1280 # inference
+    MAX_NEW_TOKENS: int = 896 # inference
 
     REPORT_DIR: Path = (
         BASE_DIR /
         "reports/evaluation"
     )
+
+    WANDB_RUN_NAME: str = "qwen3-4b-qlora-dataset-v1"
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -1,10 +1,9 @@
 import json
 
-import torch
 import pandas as pd
 from tqdm import tqdm
 
-from inference.inference import load_model
+from src.inference.inference import load_model
 from src.config.config import settings
 from src.inference.inference import predict
 from src.evaluation.judge import judge
@@ -135,9 +134,16 @@ def run_evaluation(checkpoint_path):
             }
         )
 
+        if index % 20 == 0:
+            df = pd.DataFrame(results)
+            df.to_csv(
+                settings.REPORT_DIR / "result.csv",
+                index=False,
+                encoding="utf-8-sig",
+            )
+
     # 상세 평가 결과 저장
     df = pd.DataFrame(results)
-
     df.to_csv(
         settings.REPORT_DIR / f"result.csv",
         index=False,

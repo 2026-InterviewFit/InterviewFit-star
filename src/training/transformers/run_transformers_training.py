@@ -1,6 +1,10 @@
 import os
 import wandb
 
+import gc
+import torch
+
+from src.config.config import settings
 from src.training.transformers.trainer import (
     load_transformers_model,
     apply_peft_lora,
@@ -15,7 +19,7 @@ os.environ["WANDB_LOG_MODEL"] = "false"
 def run_transformers_training_pipeline():
     wandb.init(
         project="interview-star-finetuning",
-        name="qwen3-4b-qlora-dataset-v1",
+        name=settings.WANDB_RUN_NAME,
         config={
             "base_model": "Qwen/Qwen3-4B",
             "dataset": "dataset-v1",
@@ -46,6 +50,13 @@ def run_transformers_training_pipeline():
 
         return best_checkpoint
     finally:
+        del trainer
+        del model
+        del tokenizer
+
+        gc.collect()
+        torch.cuda.empty_cache()
+
         wandb.finish()
 
 

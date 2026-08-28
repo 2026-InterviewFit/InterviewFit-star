@@ -82,10 +82,10 @@ if __name__ == "__main__":
     sample_validated_dataset(
         input_path=settings.VALIDATED_TRAIN_PATH,
         output_path=settings.FILTERED_VALIDATED_TRAIN_PATH,
-        false_sample_ratio=0.2
+        false_sample_ratio=0.1
     )
     sample_validated_dataset(
         input_path=settings.VALIDATED_VALIDATION_PATH,
         output_path=settings.FILTERED_VALIDATED_VALIDATION_PATH,
-        false_sample_ratio=0.2
+        false_sample_ratio=0.1
     )

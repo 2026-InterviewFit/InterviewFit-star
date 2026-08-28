@@ -12,7 +12,7 @@ from src.config.config import settings
 
 
 
-NUM_SAMPLES = 5
+NUM_SAMPLES = 1
 
 
 def clean_json(response: str):
@@ -96,6 +96,9 @@ def generate(
         return_tensors="pt",
     ).to(model.device)
 
+    print("Input tokens:", inputs["input_ids"].shape[-1])
+    print("Max new tokens:", max_new_tokens)
+
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
@@ -106,6 +109,8 @@ def generate(
     generated = outputs[0][
         inputs["input_ids"].shape[-1]:
     ]
+
+    print("Generated tokens:", outputs.shape[1] - inputs["input_ids"].shape[1])
 
     return tokenizer.decode(
         generated,
@@ -148,11 +153,11 @@ def predict(
 
 
 if __name__ == "__main__":
-    checkpoint_path = settings.OUTPUT_DIR / "checkpoint-xxxx" # 실제 best checkpoint 사용하기
+    checkpoint_path = settings.OUTPUT_DIR / "checkpoint-12" # 실제 best checkpoint 사용하기
 
     model, tokenizer = load_model(checkpoint_path)
 
-    df = pd.read_csv(settings.REVIEWED_VALIDATION_MERGED_PATH)
+    df = pd.read_csv(settings.FILTERED_VALIDATED_VALIDATION_PATH)
     samples = df.head(NUM_SAMPLES)
 
     for index, row in samples.iterrows():
