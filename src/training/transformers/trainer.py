@@ -65,7 +65,7 @@ def create_transformers_trainer(model, tokenizer):
         learning_rate=settings.LEARNING_RATE,
         logging_steps=50,
         save_strategy="steps",
-        save_steps=1000,
+        save_steps=500,
         eval_strategy="steps",
         eval_steps=1000,
         load_best_model_at_end=True,

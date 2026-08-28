@@ -13,7 +13,7 @@ def run_preprocess_pipeline(train_path, validation_path):
 
     valid_dataset, test_dataset = train_test_split(
         validation_dataset,
-        test_size=0.13,
+        test_size=0.5,
         random_state=42,
         shuffle=True
     )
