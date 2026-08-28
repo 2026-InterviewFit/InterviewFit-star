@@ -5,15 +5,11 @@ from src.config.config import settings
 from src.preprocess.convert_dataset import convert_csv_to_dataset, save_jsonl
 
 
-def run_preprocess_pipeline():
+def run_preprocess_pipeline(train_path, validation_path):
     # train 데이터 그대로 사용
-    train_dataset = convert_csv_to_dataset(
-        settings.REVIEWED_TRAIN_MERGED_PATH
-    )
+    train_dataset = convert_csv_to_dataset(train_path)
     # validation → valid/test 분리
-    validation_dataset = convert_csv_to_dataset(
-        settings.REVIEWED_VALIDATION_MERGED_PATH
-    )
+    validation_dataset = convert_csv_to_dataset(validation_path)
 
     valid_dataset, test_dataset = train_test_split(
         validation_dataset,
@@ -50,4 +46,12 @@ def run_preprocess_pipeline():
 
 
 if __name__ == "__main__":
-    run_preprocess_pipeline()
+    # run_preprocess_pipeline(
+    #     settings.REVIEWED_TRAIN_MERGED_PATH,
+    #     settings.REVIEWED_VALIDATION_MERGED_PATH
+    # )
+
+    run_preprocess_pipeline(
+        settings.FILTERED_VALIDATED_TRAIN_PATH,
+        settings.FILTERED_VALIDATED_VALIDATION_PATH,
+    )

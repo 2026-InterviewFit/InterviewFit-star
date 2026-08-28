@@ -23,6 +23,7 @@ def print_validated_dataset(input_path: str):
 def sample_validated_dataset(
     input_path: Path,
     output_path: Path,
+    true_sample_ratio: float = 1.0,
     false_sample_ratio: float = 0.2,
     random_state: int = 42
 ):
@@ -31,25 +32,32 @@ def sample_validated_dataset(
         encoding="utf-8-sig"
     )
 
-    # STAR 적용 가능 데이터는 전부 유지
     star_applicable = df[df["is_star_applicable"] == True]
 
-    # STAR 적용 불가능 데이터는 일부만 랜덤 샘플링
     star_not_applicable = df[df["is_star_applicable"] == False]
 
-    sample_size = int(
+    true_sample_size = int(
+        len(star_applicable) * true_sample_ratio
+    )
+
+    false_sample_size = int(
         len(star_not_applicable) * false_sample_ratio
     )
 
+    star_applicable_sampled = star_applicable.sample(
+        n=true_sample_size,
+        random_state=random_state
+    )
+
     star_not_applicable_sampled = star_not_applicable.sample(
-        n=sample_size,
+        n=false_sample_size,
         random_state=random_state
     )
 
     # 합치기
     sampled_df = pd.concat(
         [
-            star_applicable,
+            star_applicable_sampled,
             star_not_applicable_sampled
         ],
         ignore_index=True
@@ -67,7 +75,7 @@ def sample_validated_dataset(
         encoding="utf-8-sig"
     )
 
-    print(f"Input: {len(df)}")
+    print(f"\n\nInput: {len(df)}")
     print(f"STAR applicable: {len(star_applicable)}")
     print(f"STAR not applicable: {len(star_not_applicable)}")
     print(f"Sampled not applicable: {len(star_not_applicable_sampled)}")
@@ -82,10 +90,11 @@ if __name__ == "__main__":
     sample_validated_dataset(
         input_path=settings.VALIDATED_TRAIN_PATH,
         output_path=settings.FILTERED_VALIDATED_TRAIN_PATH,
-        false_sample_ratio=0.2
+        false_sample_ratio=0.1
     )
     sample_validated_dataset(
         input_path=settings.VALIDATED_VALIDATION_PATH,
         output_path=settings.FILTERED_VALIDATED_VALIDATION_PATH,
-        false_sample_ratio=0.2
+        true_sample_ratio=0.1,
+        false_sample_ratio = 0.05
     )
