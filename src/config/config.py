@@ -136,14 +136,14 @@ class Settings(BaseSettings):
     # =====================
     # Evaluation
     # =====================
-    MAX_NEW_TOKENS: int = 896 # inference
+    MAX_NEW_TOKENS: int = 512 # inference
 
     REPORT_DIR: Path = (
         BASE_DIR /
         "reports/evaluation"
     )
 
-    WANDB_RUN_NAME: str = "qwen3-4b-qlora-dataset-v1"
+    WANDB_RUN_NAME: str = "qwen3-4b-qlora-dataset-v2"
 
     model_config = SettingsConfigDict(
         env_file=".env",

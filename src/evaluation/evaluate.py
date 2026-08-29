@@ -101,6 +101,8 @@ def run_evaluation(checkpoint_path):
         else:
             try:
                 judge_result = judge(
+                    question,
+                    answer,
                     ground_truth,
                     prediction,
                 )
@@ -142,6 +144,9 @@ def run_evaluation(checkpoint_path):
                 encoding="utf-8-sig",
             )
 
+            print("\n--- Latest Result ---")
+            print(results[-1])
+
     # 상세 평가 결과 저장
     df = pd.DataFrame(results)
     df.to_csv(
@@ -167,5 +172,5 @@ def run_evaluation(checkpoint_path):
 
 
 if __name__ == "__main__":
-    checkpoint_path = settings.OUTPUT_DIR / "checkpoint-xxxx" # 실제 best checkpoint 사용하기
+    checkpoint_path = settings.OUTPUT_DIR / "checkpoint-633" # 실제 best checkpoint 사용하기
     run_evaluation(checkpoint_path)

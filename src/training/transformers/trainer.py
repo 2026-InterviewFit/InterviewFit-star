@@ -65,9 +65,9 @@ def create_transformers_trainer(model, tokenizer):
         learning_rate=settings.LEARNING_RATE,
         logging_steps=50,
         save_strategy="steps",
-        save_steps=500,
+        save_steps=100,
         eval_strategy="steps",
-        eval_steps=1000,
+        eval_steps=100,
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
@@ -90,11 +90,11 @@ def create_transformers_trainer(model, tokenizer):
         args=training_args,
     )
 
-    # trainer.add_callback(
-    #     SaveEpochCallback(
-    #         tokenizer,
-    #         settings.SAVE_MODEL_PATH,
-    #     )
-    # )
+    trainer.add_callback(
+        SaveEpochCallback(
+            tokenizer,
+            settings.OUTPUT_DIR,
+        )
+    )
 
     return trainer

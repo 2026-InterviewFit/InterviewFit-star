@@ -12,7 +12,7 @@ from src.config.config import settings
 
 
 
-NUM_SAMPLES = 1
+NUM_SAMPLES = 10
 
 
 def clean_json(response: str):
@@ -104,6 +104,7 @@ def generate(
             **inputs,
             max_new_tokens=max_new_tokens,
             do_sample=False,
+            repetition_penalty=1.1,
         )
 
     generated = outputs[0][
@@ -153,7 +154,7 @@ def predict(
 
 
 if __name__ == "__main__":
-    checkpoint_path = settings.OUTPUT_DIR / "checkpoint-12" # 실제 best checkpoint 사용하기
+    checkpoint_path = settings.OUTPUT_DIR / "checkpoint-633" # 실제 best checkpoint 사용하기
 
     model, tokenizer = load_model(checkpoint_path)
 

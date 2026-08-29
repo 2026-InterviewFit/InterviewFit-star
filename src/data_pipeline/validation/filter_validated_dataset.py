@@ -95,6 +95,6 @@ if __name__ == "__main__":
     sample_validated_dataset(
         input_path=settings.VALIDATED_VALIDATION_PATH,
         output_path=settings.FILTERED_VALIDATED_VALIDATION_PATH,
-        true_sample_ratio=0.1,
-        false_sample_ratio = 0.05
+        true_sample_ratio=0.15,
+        false_sample_ratio = 0.03
     )
