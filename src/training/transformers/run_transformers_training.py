@@ -22,7 +22,7 @@ def run_transformers_training_pipeline():
         name=settings.WANDB_RUN_NAME,
         config={
             "base_model": "Qwen/Qwen3-4B",
-            "dataset": "dataset-v1",
+            "dataset": "dataset-v1-refine",
             "finetuning_method": "QLoRA",
             "lora_r": 16,
             "lora_alpha": 32,

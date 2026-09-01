@@ -143,7 +143,7 @@ class Settings(BaseSettings):
         "reports/evaluation"
     )
 
-    WANDB_RUN_NAME: str = "qwen3-4b-qlora-dataset-v2"
+    WANDB_RUN_NAME: str = "qwen3-4b-qlora-dataset-v3"
 
     model_config = SettingsConfigDict(
         env_file=".env",

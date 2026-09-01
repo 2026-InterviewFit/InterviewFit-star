@@ -1,16 +1,19 @@
 from huggingface_hub import create_repo, upload_folder
 
 
+repo_id = ""
+
+
 create_repo(
-    "repo_name",
+    repo_id,
     repo_type="model",
     exist_ok=True,
 )
 
 
 upload_folder(
-    folder_path="outputs/checkpoint-633",
-    repo_id="your_repo_id",
+    folder_path="outputs/v1/checkpoint-633", # 수정하기
+    repo_id=repo_id,
     repo_type="model",
     allow_patterns=[
         # 필수: LoRA 어댑터
