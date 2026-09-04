@@ -64,6 +64,10 @@ def create_transformers_trainer(model, tokenizer):
         gradient_accumulation_steps=settings.GRAD_ACCUMULATION,
         learning_rate=settings.LEARNING_RATE,
         logging_steps=50,
+        # eval_strategy="steps",
+        # eval_steps=211,
+        # save_strategy="steps",
+        # save_steps=211,
         save_strategy="epoch",
         eval_strategy="epoch",
         load_best_model_at_end=True,
@@ -71,7 +75,7 @@ def create_transformers_trainer(model, tokenizer):
         greater_is_better=False,
         # save_total_limit=3,
         bf16=True,
-        optim="paged_adamw_8bit",
+        optim="adamw_torch",
         lr_scheduler_type="cosine",
         weight_decay=0.01,
         warmup_ratio=0.03,
@@ -88,11 +92,11 @@ def create_transformers_trainer(model, tokenizer):
         args=training_args,
     )
 
-    trainer.add_callback(
-        SaveEpochCallback(
-            tokenizer,
-            settings.OUTPUT_DIR,
-        )
-    )
+    # trainer.add_callback(
+    #     SaveEpochCallback(
+    #         tokenizer,
+    #         settings.OUTPUT_DIR,
+    #     )
+    # )
 
     return trainer

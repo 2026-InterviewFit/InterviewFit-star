@@ -11,6 +11,7 @@ create_repo(
 )
 
 
+# LoRA Adapter
 upload_folder(
     folder_path="outputs/v1/checkpoint-633", # 수정하기
     repo_id=repo_id,
@@ -29,4 +30,12 @@ upload_folder(
         # 문서
         "README.md",
     ],
+)
+
+
+# model
+upload_folder(
+    folder_path="outputs/v1/merged-qwen3-4b-star", # 수정하기
+    repo_id=repo_id,
+    repo_type="model",
 )
