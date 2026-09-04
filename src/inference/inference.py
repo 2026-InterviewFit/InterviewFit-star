@@ -40,7 +40,6 @@ def load_model(model_path):
         settings.MODEL_NAME,
         quantization_config=nb_config,
         device_map="cuda",
-        attn_implementation="sdpa",
     )
 
     # Inference: KV Cache ON

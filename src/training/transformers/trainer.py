@@ -26,7 +26,6 @@ def load_transformers_model():
         settings.MODEL_NAME,
         quantization_config=bnb_config,
         device_map={"": 0},
-        attn_implementation="sdpa",
     )
 
     return model, tokenizer
